@@ -22,10 +22,12 @@ class KayakApp(JoyApp):
 		self.shoulderMotorString = shoulderMotorString
 		self.motorAccuracy = 200
 
-		self.hipRight = 3000
-		self.hipLeft = -3000
-		self.shoulderRightFront = 4500
-		self.shoulderLeftFront = -4500
+		self.hipRight = 5100
+		self.hipLeft = -5100
+		self.shoulderRightFront = -205
+		self.shoulderRightBack = -2700
+		self.shoulderLeftFront = 205
+		self.shoulderLeftBack = 2700
 
 		exec("self.hipMotor = self.robot.at." + hipMotorString)
 		exec("self.shoulderMotor = self.robot.at." + shoulderMotorString)
@@ -48,13 +50,13 @@ class KayakApp(JoyApp):
 		elif (state == State.LEFT_BEGIN):
 			self.moveMotors(self.hipLeft, self.shoulderLeftFront)
 		elif (state == State.LEFT_END):
-			self.moveMotors(self.hipLeft, self.shoulderRightFront)
+			self.moveMotors(self.hipLeft, self.shoulderLeftBack)
 		elif (state == State.RIGHT_NEUTRAL):
 			self.moveMotors(0, self.shoulderRightFront)
 		elif (state == State.RIGHT_BEGIN):
 			self.moveMotors(self.hipRight, self.shoulderRightFront)
 		elif (state == State.RIGHT_END):
-			self.moveMotors(self.hipRight, self.shoulderLeftFront)
+			self.moveMotors(self.hipRight, self.shoulderRightBack)
 
 
 	def currState(self):
@@ -66,50 +68,52 @@ class KayakApp(JoyApp):
 
 		shoulderMotorAngle = self.shoulderMotor.get_pos()
 		shoulderDifferences = dict()
-		shoulderDifferences[abs(shoulderMotorAngle - self.shoulderRightFront)] = 0
-		shoulderDifferences[abs(shoulderMotorAngle - 0)] = 1
-		shoulderDifferences[abs(shoulderMotorAngle - self.shoulderLeftFront)] = 2
+		shoulderDifferences[abs(shoulderMotorAngle - self.shoulderRightBack)] = 0
+		shoulderDifferences[abs(shoulderMotorAngle - self.shoulderRightFront)] = 1
+		shoulderDifferences[abs(shoulderMotorAngle - self.shoulderLeftBack)] = 2
+		shoulderDifferences[abs(shoulderMotorAngle - self.shoulderLeftFront)] = 3
 
 		closestHipAngle = hipDifferences[min(hipDifferences)]
 		closestShoulderAngle = shoulderDifferences[min(shoulderDifferences)]
 
+
+		print("Hip: " + str(closestHipAngle) + "\n" + "Shoulder: " + str(closestShoulderAngle))
+
 		if (closestHipAngle == 0):
 			# hip left
-			if (closestShoulderAngle == 0):
+			if (closestShoulderAngle == 2):
 				# shoulder right front
 				return State.LEFT_END
-			elif (closestShoulderAngle == 1):
-				# shoulder center
-				return State.INVALID
-			else:
-				# shoulder left front
+			elif (closestShoulderAngle == 3):
 				return State.LEFT_BEGIN
+			elif (closestShoulderAngle == 1):
+				return State.INVALID
 		elif (closestHipAngle == 1):
 			# hip center
-			if (closestShoulderAngle == 0):
+			if (closestShoulderAngle == 1):
 				# shoulder right front
 				return State.RIGHT_NEUTRAL
-			elif (closestShoulderAngle == 1):
+			elif (closestShoulderAngle == 3):
 				# shoulder center
-				return State.NEUTRAL
+				return State.LEFT_NEUTRAL
 			else:
 				# shoulder left front
-				return State.LEFT_NEUTRAL
+				return State.NEUTRAL
 		else:
 			# hip right
 			if (closestShoulderAngle == 0):
 				# shoulder right front
-				return State.RIGHT_BEGIN
+				return State.RIGHT_END
 			elif (closestShoulderAngle == 1):
 				# shoulder center
-				return State.INVALID
+				return State.RIGHT_BEGIN
 			else:
 				# shoulder left front
-				return State.RIGHT_END
+				return State.INVALID
 
 	## PATTERNS
 	def strokeRight(self, currState, initialCall = True):
-		# print("Stroke Right: " + str(currState))
+		print("Stroke Right: " + str(currState))
 		if (not initialCall):
 			self.gotoState(currState)
 
@@ -183,9 +187,9 @@ class KayakApp(JoyApp):
 			return
 
 		if evt.key == K_w:
-			print str(self.currState())
-			# print "hip: " + str(self.hipMotor.get_pos())
-			# print "shoulder: " + str(self.shoulderMotor.get_pos())
+			print "state: " + str(self.currState())
+			print "hip: " + str(self.hipMotor.get_pos())
+			print "shoulder: " + str(self.shoulderMotor.get_pos())
 		elif evt.key == K_d:
 			print "Start right stroke"
 			# rightStroke(self.hipMotor, self.shoulderMotor)
