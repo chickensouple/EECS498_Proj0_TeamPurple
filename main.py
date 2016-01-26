@@ -16,7 +16,6 @@ class State:
 	RIGHT_END_NEUTRAL = 9
 	INVALID = 10
 
-
 class KayakApp(JoyApp):
 	def __init__(self, hipMotor, shoulderMotor, *arg, **kw):
 		JoyApp.__init__(self, *arg, **kw)
@@ -136,7 +135,7 @@ class KayakApp(JoyApp):
 			else:
 				return
 		elif (currState == State.RIGHT_END_NEUTRAL):
-			return self.strokeRight(State.LEFT_BEGIN, False)
+			return self.strokeRight(State.RIGHT_BEGIN_NEUTRAL, False)
 
 	def strokeLeft(self, currState, initialCall = True):
 		if (not initialCall):
@@ -163,7 +162,7 @@ class KayakApp(JoyApp):
 			else:
 				return
 		elif (currState == State.LEFT_END_NEUTRAL):
-			return self.strokeLeft(State.RIGHT_BEGIN, False)
+			return self.strokeLeft(State.LEFT_BEGIN_NEUTRAL, False)
 
 	def strokeRightBack(self, currState, initialCall = True):
 		if (not initialCall):
