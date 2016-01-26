@@ -1,8 +1,8 @@
 from joy import *
 
 # parameters
-hipMotorString = "Nx0B"
-shoulderMotorString = "Nx0C"
+hipMotorString = "Nx0C"
+shoulderMotorString = "Nx0B"
 
 motorAccuracy = 200
 
@@ -39,8 +39,6 @@ def neutralPosition(hipMotor, shoulderMotor):
 
 
 class KayakApp(JoyApp):
-	BALANCE = loadCSV("balance.csv")
-
 	def __init__(self, hipMotor, shoulderMotor, *arg, **kw):
 		JoyApp.__init__(self, *arg, **kw)
 		self.hipMotorString = hipMotorString
@@ -49,8 +47,7 @@ class KayakApp(JoyApp):
 		exec("self.shoulderMotor = self.robot.at." + shoulderMotorString)
 
 	def onStart(self):
-		self.balancePlan = SheetPlan(self, self.BALANCE, x=self.hipMotorString + "/@set_pos")
-		self.balancePlan2 = SheetPlan(self, self.BALANCE, x=self.shoulderMotorString + "/@set_pos")
+		pass
 
 	def onEvent(self, evt):
 		if evt.type == TIMEREVENT:
@@ -64,8 +61,6 @@ class KayakApp(JoyApp):
 
 			print "hip: " + str(self.hipMotor.get_pos())
 			print "shoulder: " + str(self.shoulderMotor.get_pos())
-			# self.balancePlan.start()
-			# self.balancePlan2.start()
 		elif evt.key == K_d:
 			print "Start right stroke"
 			rightStroke(self.hipMotor, self.shoulderMotor)
