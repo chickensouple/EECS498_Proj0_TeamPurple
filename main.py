@@ -136,7 +136,7 @@ class KayakApp(JoyApp):
 			else:
 				return
 		elif (currState == State.RIGHT_END_NEUTRAL):
-			return self.strokeRight(State.RIGHT_BEGIN_NEUTRAL, False)
+			return self.strokeRight(State.LEFT_BEGIN, False)
 
 	def strokeLeft(self, currState, initialCall = True):
 		if (not initialCall):
@@ -163,13 +163,12 @@ class KayakApp(JoyApp):
 			else:
 				return
 		elif (currState == State.LEFT_END_NEUTRAL):
-			return self.strokeLeft(State.LEFT_BEGIN_NEUTRAL, False)
+			return self.strokeLeft(State.RIGHT_BEGIN, False)
 
 	def strokeNeutral(self, currState, initialCall = True):
 		self.gotoState(State.NEUTRAL)
 
-
-	# # Higher Level Patterns
+	# Higher Level Patterns
 	# def strokeForward(self, currState):
 
 
