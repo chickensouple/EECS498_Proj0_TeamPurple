@@ -64,7 +64,6 @@ class KayakApp(JoyApp):
 		elif (state == State.RIGHT_END_NEUTRAL):
 			self.moveMotors(0, self.shoulderRightEnd)
 
-
 	def currState(self):
 		hipMotorAngle = self.hipMotor.get_pos()
 		hipDifferences = dict()
@@ -170,8 +169,8 @@ class KayakApp(JoyApp):
 		self.gotoState(State.NEUTRAL)
 
 
-	# Higher Level Patterns
-	def strokeForward(self, currState):
+	# # Higher Level Patterns
+	# def strokeForward(self, currState):
 
 
 	def onStart(self):
