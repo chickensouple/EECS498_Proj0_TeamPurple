@@ -165,6 +165,58 @@ class KayakApp(JoyApp):
 		elif (currState == State.LEFT_END_NEUTRAL):
 			return self.strokeLeft(State.RIGHT_BEGIN, False)
 
+	def strokeRightBack(self, currState, initialCall = True):
+		if (not initialCall):
+			self.gotoState(currState)
+
+		if (currState == State.NEUTRAL):
+			self.strokeRightBack(State.RIGHT_END_NEUTRAL, False)
+		elif (currState == State.RIGHT_BEGIN_NEUTRAL):
+			self.strokeRightBack(State.RIGHT_END_NEUTRAL, False)
+		elif (currState == State.RIGHT_BEGIN):
+			if (initialCall):
+				self.strokeRightBack(State.RIGHT_BEGIN_NEUTRAL, False)
+			else :
+				return
+		elif (currState == State.RIGHT_END):
+			self.strokeRightBack(State.RIGHT_BEGIN, False)
+		elif (currState == State.RIGHT_END_NEUTRAL):
+			self.strokeRightBack(State.RIGHT_END, False)
+		elif (currState == State.LEFT_BEGIN_NEUTRAL):
+			self.strokeRightBack(State.RIGHT_END, False)
+		elif (currState == State.LEFT_BEGIN):
+			self.strokeRightBack(State.RIGHT_END, False)
+		elif (currState == State.LEFT_END):
+			self.strokeRightBack(State.LEFT_END_NEUTRAL, False)
+		elif (currState == State.LEFT_END_NEUTRAL):
+			self.strokeRightBack(State.RIGHT_END_NEUTRAL, False)
+
+	def strokeLeftBack(self, currState, initialCall = True):
+		if (not initialCall):
+			self.gotoState(currState)
+
+		if (currState == State.NEUTRAL):
+			self.strokeLeftBack(State.LEFT_END_NEUTRAL, False)
+		elif (currState == State.LEFT_BEGIN_NEUTRAL):
+			self.strokeLeftBack(State.LEFT_END_NEUTRAL, False)
+		elif (currState == State.LEFT_BEGIN):
+			if (initialCall):
+				self.strokeLeftBack(State.LEFT_BEGIN_NEUTRAL, False)
+			else :
+				return
+		elif (currState == State.LEFT_END):
+			self.strokeLeftBack(State.LEFT_BEGIN, False)
+		elif (currState == State.LEFT_END_NEUTRAL):
+			self.strokeLeftBack(State.LEFT_END, False)
+		elif (currState == State.RIGHT_BEGIN_NEUTRAL):
+			self.strokeLeftBack(State.LEFT_END, False)
+		elif (currState == State.RIGHT_BEGIN):
+			self.strokeLeftBack(State.LEFT_END, False)
+		elif (currState == State.RIGHT_END):
+			self.strokeLeftBack(State.RIGHT_END_NEUTRAL, False)
+		elif (currState == State.RIGHT_END_NEUTRAL):
+			self.strokeLeftBack(State.LEFT_END_NEUTRAL, False)		
+
 	def strokeNeutral(self, currState, initialCall = True):
 		self.gotoState(State.NEUTRAL)
 
@@ -178,7 +230,6 @@ class KayakApp(JoyApp):
 			# start with left stroke
 			self.strokeLeft(currState)
 			self.strokeRight(self.currState())
-
 
 	def onStart(self):
 		pass
@@ -210,7 +261,15 @@ class KayakApp(JoyApp):
 			print "Start neutral position"
 			self.strokeNeutral(self.currState())
 			print "End neutral position"
+		elif evt.key == K_c:
+			print "Start Right Back Stroke"
+			self.strokeRightBack(self.currState())
+			print "End Right Back Stroke"
 		elif evt.key == K_z:
+			print "Start Left Back Stroke"
+			self.strokeLeftBack(self.currState())
+			print "End Left Back Stroke"
+		elif evt.key == K_q:
 			self.hipMotor.go_slack()
 			self.shoulderMotor.go_slack()
 			print "Slack"
