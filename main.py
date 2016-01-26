@@ -169,7 +169,15 @@ class KayakApp(JoyApp):
 		self.gotoState(State.NEUTRAL)
 
 	# Higher Level Patterns
-	# def strokeForward(self, currState):
+	def strokeForward(self, currState):
+		if currState in [State.RIGHT_BEGIN, State.LEFT_END, State.LEFT_END_NEUTRAL, State.RIGHT_BEGIN_NEUTRAL]:
+			# start with right stroke
+			self.strokeRight(currState)
+			self.strokeLeft(self.currState())
+		else:
+			# start with left stroke
+			self.strokeLeft(currState)
+			self.strokeRight(self.currState())
 
 
 	def onStart(self):
@@ -182,10 +190,14 @@ class KayakApp(JoyApp):
 		if evt.type != KEYDOWN:
 			return
 
-		if evt.key == K_w:
+		if evt.key == K_x:
 			print "state: " + str(self.currState())
 			print "hip: " + str(self.hipMotor.get_pos())
 			print "shoulder: " + str(self.shoulderMotor.get_pos())
+		elif evt.key == K_w:
+			print "Start Forward Stroke"
+			self.strokeForward(self.currState())
+			print "End Forward Stroke"
 		elif evt.key == K_d:
 			print "Start right stroke"
 			self.strokeRight(self.currState())
