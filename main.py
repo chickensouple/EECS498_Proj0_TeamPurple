@@ -8,25 +8,22 @@ import time
 hipMotorString = "Nx0C"
 shoulderMotorString = "Nx0B"
 
-
-
 class KayakApp(JoyApp):
 	def __init__(self, hipMotor, shoulderMotor, *arg, **kw):
 		JoyApp.__init__(self, *arg, **kw)
 		self.hipMotorString = hipMotorString
 		self.shoulderMotorString = shoulderMotorString
 
-		self.motorAccuracy = 150
-		self.hipRight = 4200
-		self.hipLeft = -4200
-		self.shoulderLeftBegin = 1000
+		self.motorAccuracy = 200
+		self.hipRight = 4600
+		self.hipLeft = -4600
+		self.shoulderLeftBegin = -205
 		self.shoulderLeftEnd = -2700
-		self.shoulderRightBegin = -1000
+		self.shoulderRightBegin = 205
 		self.shoulderRightEnd = 2700
 
-
-		self.motorSpeedFast = 112
-		self.motorSpeedSlow = 80
+		self.motorSpeedFast = 113
+		self.motorSpeedSlow = 60
 
 		exec("self.hipMotor = self.robot.at." + hipMotorString)
 		exec("self.shoulderMotor = self.robot.at." + shoulderMotorString)
@@ -112,50 +109,6 @@ class KayakApp(JoyApp):
 			print "hip: " + str(self.hipMotor.get_pos())
 			print "shoulder: " + str(self.shoulderMotor.get_pos())
 			print "state: " + str(self.currState())
-
-		# if evt.key == K_q:
-		# 	self.hipMotor.go_slack()
-		# 	self.shoulderMotor.go_slack()
-		# 	print("Slack")
-		# elif evt.key == K_d:
-		# 	print("Begin Right")
-		# 	self.app.moveMotors(self.hipRight, self.shoulderRightBegin)
-		# 	yield self.forDuration(0.5)
-		# 	self.rightStrokeAction.start()
-		# 	print("End Right")
-
-		# if evt.key == K_x:
-		# 	print "state: " + str(self.currState())
-		# 	print "hip: " + str(self.hipMotor.get_pos())
-		# 	print "shoulder: " + str(self.shoulderMotor.get_pos())
-		# elif evt.key == K_w:
-		# 	print "Start Forward Stroke"
-		# 	self.strokeForward(self.currState())
-		# 	print "End Forward Stroke"
-		# elif evt.key == K_d:
-		# 	print "Start right stroke"
-		# 	self.strokeRight(self.currState())
-		# 	print "End right stroke"
-		# elif evt.key == K_a:
-		# 	print "Start left stroke"
-		# 	self.strokeLeft(self.currState())
-		# 	print "End left stroke"
-		# elif evt.key == K_s:
-		# 	print "Start neutral position"
-		# 	self.strokeNeutral(self.currState())
-		# 	print "End neutral position"
-		# elif evt.key == K_c:
-		# 	print "Start Right Back Stroke"
-		# 	self.strokeRightBack(self.currState())
-		# 	print "End Right Back Stroke"
-		# elif evt.key == K_z:
-		# 	print "Start Left Back Stroke"
-		# 	self.strokeLeftBack(self.currState())
-		# 	print "End Left Back Stroke"
-		# elif evt.key == K_q:
-		# 	self.hipMotor.go_slack()
-		# 	self.shoulderMotor.go_slack()
-		# 	print "Slack"
 
 robot = {"count": 2}
 scr = {}

@@ -1,5 +1,6 @@
 from joy import *
 from state import *
+import timeit
 
 class RightStrokeStep(Plan):
 	def __init__(self, app, *arg, **kw):
