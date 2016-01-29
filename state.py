@@ -1,0 +1,6 @@
+
+class State:
+	RIGHT_BEGIN = 0
+	RIGHT_END = 1
+	LEFT_BEGIN = 2
+	LEFT_END = 3

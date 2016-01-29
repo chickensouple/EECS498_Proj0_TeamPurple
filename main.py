@@ -1,136 +1,14 @@
 from joy import *
+from actions import *
+from steps import *
+from state import *
 import time
 
 # parameters
 hipMotorString = "Nx0C"
 shoulderMotorString = "Nx0B"
 
-class BasePlan(Plan):
-	def __init__(self, app, *arg, **kw):
-		Plan.__init__(self, app, *arg, **kw)
 
-	# def waitForMotorPos(hipPos, shoulderPos):
-	# 	while (abs(self.app.hipMotor.get_pos() - hipPos) > self.app.motorAccuracy):
-	# 		yield self.forDuration(0.05)
-	# 	while (abs(self.app.shoulderMotor.get_pos() - shoulderPos) > self.app.motorAccuracy):
-	# 		yield self.forDuration(0.05)
-
-	def moveMotors(hipPos, shoulderPos):
-		self.app.hipMotor.set_pos(hipMotorPos)
-		self.app.shoulderMotor.set_pos(shoulderMotorPos)
-		while (abs(self.app.hipMotor.get_pos() - hipPos) > self.app.motorAccuracy):
-			yield self.forDuration(0.05)
-		while (abs(self.app.shoulderMotor.get_pos() - shoulderPos) > self.app.motorAccuracy):
-			yield self.forDuration(0.05)
-
-
-class RightStrokePlan(BasePlan):
-	def __init__(self, app, *arg, **kw):
-		BasePlan.__init__(self, app, *arg, **kw)
-		
-	def behavior(self):
-		self.app.setSpeed(20)
-
-		# targetPos = self.app.shoulderRightBegin
-		# n = 20
-		# totalTime = 0.5
-		# distance = self.app.shoulderRightEnd - self.app.shoulderRightBegin
-
-		# deltaTime = totalTime / n
-		# deltaDistance = distance / n
-
-		# T0 = self.app.now
-		# print("deltaTime: " + str(deltaTime))
-		# for i in range(n):
-		# 	targetPos += deltaDistance
-		# 	self.app.moveMotors(self.app.hipRight, targetPos)
-		# 	print("Target pos: " + str(targetPos))
-		# 	yield self.forDuration(deltaTime)
-
-		self.moveMotors(self.app.hipRight, self.app.shoulderRightEnd)
-
-		# while (abs(self.app.shoulderMotor.get_pos() - self.app.shoulderRightEnd) > self.app.motorAccuracy):
-		# 	yield self.forDuration(0.05)
-		# while (abs(self.app.hipMotor.get_pos() - self.app.hipRight) > self.app.motorAccuracy):
-		# 	yield self.forDuration(0.05)
-
-
-class LeftStrokePlan(BasePlan):
-	def __init__(self, app, *arg, **kw):
-		BasePlan.__init__(self, app, *arg, **kw)
-
-	def behavior(self):
-		self.app.setSpeed(20)
-		self.moveMotors(self.app.hipLeft, self.app.shoulderLeftEnd)
-
-		# while (abs(self.app.shoulderMotor.get_pos() - self.app.shoulderLeftEnd) > self.app.motorAccuracy):
-		# 	yield self.forDuration(0.05)
-		# while (abs(self.app.hipMotor.get_pos() - self.app.hipLeft) > self.app.motorAccuracy):
-		# 	yield self.forDuration(0.05)
-
-class RightToLeftTransitionPlan(Plan):
-	def __init__(self, app, *arg, **kw):
-		Plan.__init__(self, app, *arg, **kw)
-
-	def behavior(self):
-		self.app.setSpeed(101)
-
-		self.moveMotors(self.app.hipLeft, self.app.shoulderLeftBegin)
-		# while (abs(self.app.shoulderMotor.get_pos() - self.app.shoulderLeftBegin) > self.app.motorAccuracy):
-		# 	yield self.forDuration(0.05)
-		# while (abs(self.app.hipMotor.get_pos() - self.app.hipLeft) > self.app.motorAccuracy):
-		# 	yield self.forDuration(0.05)
-
-class LeftToRightTransitionPlan(Plan):
-	def __init__(self, app, *arg, **kw):
-		Plan.__init__(self, app, *arg, **kw)
-
-	def behavior(self):
-		self.app.setSpeed(101)
-
-		self.app.moveMotors(self.app.hipRight, self.app.shoulderRightBegin)
-
-		self.waitForMotorPos(self.app.hipRight, self.app.shoulderRightBegin)
-		# while (abs(self.app.shoulderMotor.get_pos() - self.app.shoulderRightBegin) > self.app.motorAccuracy):
-		# 	yield self.forDuration(0.05)
-		# while (abs(self.app.hipMotor.get_pos() - self.app.hipRight) > self.app.motorAccuracy):
-		# 	yield self.forDuration(0.05)
-
-class RightResetPlan(Plan):
-	def __init__(self, app, *arg, **kw):
-		Plan.__init__(self, app, *arg, **kw)
-
-	def behavior(self):
-		self.app.setSpeed(101)
-		currShoulder = self.app.shoulderMotor.get_pos()
-
-		hipUp = self.app.hipRight * 0.9
-
-		# lift up slightly without moving shoulder
-		self.moveMotors(hipUp, currShoulder)
-		# self.waitForMotorPos(hipUp, currShoulder)
-
-		self.moveMotors(hipUp, self.app.shoulderRightBegin)
-		# self.waitForMotorPos(hipUp, self.app, shoulderRightBegin)
-
-		self.moveMotors(self.app.hipRight, self.app.shoulderRightBegin)
-		# self.waitForMotorPos(self.app.hipRight, self.app.shoudlerRightBegin)
-
-class LeftResetPlan(Plan):
-	def __init__(self, app, *arg, **kw):
-		Plan.__init__(self, app, *arg, **kw)
-
-	def behavior(self):
-		self.app.setSpeed(101)
-		
-		currShoulder = self.app.shoulderMotor.get_pos()
-		hipUp = self.app.hipLeft * 0.9
-
-		self.moveMotors(hipUp, currShoulder)
-
-		self.moveMotors(hipUp, self.app.shoulderLeftBegin)
-
-		self.moveMotors(self.app.hipRight, self.app.shoulderLeftBegin)
 
 class KayakApp(JoyApp):
 	def __init__(self, hipMotor, shoulderMotor, *arg, **kw):
@@ -146,30 +24,66 @@ class KayakApp(JoyApp):
 		self.shoulderRightBegin = -1000
 		self.shoulderRightEnd = 2700
 
+
+		self.motorSpeedFast = 112
+		self.motorSpeedSlow = 80
+
 		exec("self.hipMotor = self.robot.at." + hipMotorString)
 		exec("self.shoulderMotor = self.robot.at." + shoulderMotorString)
 
-	# def moveMotors(self, hipMotorPos, shoulderMotorPos):
-	# 	self.hipMotor.set_pos(hipMotorPos)
-	# 	self.shoulderMotor.set_pos(shoulderMotorPos)
+	## GENERAL FUNCTIONS
+	def moveMotors(self, hipMotorPos, shoulderMotorPos):
+		self.hipMotor.set_pos(hipMotorPos)
+		self.shoulderMotor.set_pos(shoulderMotorPos)
 
 	def setSpeed(self, speed):
 		self.hipMotor.set_speed(speed)
 		self.shoulderMotor.set_speed(speed)
 
 		# make sure the speed was actually set
-		while (hipMotor.get_speed() != speed):
+		while (abs(self.hipMotor.get_moving_speed() - speed) > 10):
 			self.hipMotor.set_speed(speed)
-		while (shoulderMotor.get_speed() != speed):
+		while (abs(self.hipMotor.get_moving_speed() - speed) > 10):
 			self.shoulderMotor.set_speed(speed)
 
+	def currState(self):
+		hipMotorAngle = self.hipMotor.get_pos()
+		hipDifferences = dict()
+		hipDifferences[abs(hipMotorAngle - self.hipLeft)] = 0
+		hipDifferences[abs(hipMotorAngle - self.hipRight)] = 1
+
+		closestHipAngle = hipDifferences[min(hipDifferences)]
+
+		shoulderMotorAngle = self.shoulderMotor.get_pos()
+
+		if (closestHipAngle == 0):
+			# hip left
+			shoulderLeftBeginDiff = abs(shoulderMotorAngle - self.shoulderLeftBegin)
+			shoulderLeftEndDiff = abs(shoulderMotorAngle - self.shoulderLeftEnd)
+			if (shoulderLeftBeginDiff < shoulderLeftEndDiff):
+				return State.LEFT_BEGIN
+			else:
+				return State.LEFT_END
+		else:
+			# hip right
+			shoulderRightBeginDiff = abs(shoulderMotorAngle - self.shoulderRightBegin)
+			shoulderRightEndDiff = abs(shoulderMotorAngle - self.shoulderRightEnd)
+			if (shoulderRightBeginDiff < shoulderRightEndDiff):
+				return State.RIGHT_BEGIN
+			else:
+				return State.RIGHT_END
+
 	def onStart(self):
-		self.rightStrokePlan = RightStrokePlan(self)
-		self.leftStrokePlan = LeftStrokePlan(self)
-		self.rightToLeftTransitionPlan = RightToLeftTransitionPlan(self)
-		self.leftToRightTransitionPlan = LeftToRightTransitionPlan(self)
-		self.rightResetPlan = RightResetPlan(self)
-		self.leftResetPlan = LeftResetPlan(self)
+		self.rightStrokeAction = RightStrokeAction(self)
+		self.leftStrokeAction = LeftStrokeAction(self)
+		self.rightToLeftTransitionAction = RightToLeftTransitionAction(self)
+		self.leftToRightTransitionAction = LeftToRightTransitionAction(self)
+		self.rightResetAction = RightResetAction(self)
+		self.leftResetAction = LeftResetAction(self)
+
+		self.rightStrokeStep = RightStrokeStep(self)
+		self.leftStrokeStep = LeftStrokeStep(self)
+		self.forwardStrokeStep = ForwardStep(self)
 
 	def onEvent(self, evt):
 		if evt.type == TIMEREVENT:
@@ -184,18 +98,20 @@ class KayakApp(JoyApp):
 			print("Slack")
 		elif evt.key == K_a:
 			print("Begin Left")
-			# self.moveMotors(self.hipLeft, self.shoulderLeftBegin)
-			self.leftStrokePlan.start()
+			self.leftStrokeStep.start()
 			print("End Left")
 		elif evt.key == K_d:
 			print("Begin Right")
-			# self.moveMotors(self.hipRight, self.shoulderRightBegin)
-			self.rightStrokePlan.start()
+			self.rightStrokeStep.start()
 			print("End Right")
+		elif evt.key == K_w:
+			print("Begin Forward")
+			self.forwardStrokeStep.start()
+			print("End Forward")
 		elif evt.key == K_x:
 			print "hip: " + str(self.hipMotor.get_pos())
 			print "shoulder: " + str(self.shoulderMotor.get_pos())
-			self.rightToLeftTransitionPlan.start()
+			print "state: " + str(self.currState())
 
 		# if evt.key == K_q:
 		# 	self.hipMotor.go_slack()
@@ -203,9 +119,9 @@ class KayakApp(JoyApp):
 		# 	print("Slack")
 		# elif evt.key == K_d:
 		# 	print("Begin Right")
-		# 	self.moveMotors(self.hipRight, self.shoulderRightBegin)
+		# 	self.app.moveMotors(self.hipRight, self.shoulderRightBegin)
 		# 	yield self.forDuration(0.5)
-		# 	self.rightStrokePlan.start()
+		# 	self.rightStrokeAction.start()
 		# 	print("End Right")
 
 		# if evt.key == K_x:
