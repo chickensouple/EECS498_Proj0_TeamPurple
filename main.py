@@ -5,9 +5,28 @@ import time
 hipMotorString = "Nx0C"
 shoulderMotorString = "Nx0B"
 
-class RightStrokePlan(Plan):
+class BasePlan(Plan):
 	def __init__(self, app, *arg, **kw):
 		Plan.__init__(self, app, *arg, **kw)
+
+	# def waitForMotorPos(hipPos, shoulderPos):
+	# 	while (abs(self.app.hipMotor.get_pos() - hipPos) > self.app.motorAccuracy):
+	# 		yield self.forDuration(0.05)
+	# 	while (abs(self.app.shoulderMotor.get_pos() - shoulderPos) > self.app.motorAccuracy):
+	# 		yield self.forDuration(0.05)
+
+	def moveMotors(hipPos, shoulderPos):
+		self.app.hipMotor.set_pos(hipMotorPos)
+		self.app.shoulderMotor.set_pos(shoulderMotorPos)
+		while (abs(self.app.hipMotor.get_pos() - hipPos) > self.app.motorAccuracy):
+			yield self.forDuration(0.05)
+		while (abs(self.app.shoulderMotor.get_pos() - shoulderPos) > self.app.motorAccuracy):
+			yield self.forDuration(0.05)
+
+
+class RightStrokePlan(BasePlan):
+	def __init__(self, app, *arg, **kw):
+		BasePlan.__init__(self, app, *arg, **kw)
 		
 	def behavior(self):
 		self.app.setSpeed(20)
@@ -28,24 +47,26 @@ class RightStrokePlan(Plan):
 		# 	print("Target pos: " + str(targetPos))
 		# 	yield self.forDuration(deltaTime)
 
-		self.app.moveMotors(self.app.hipRight, self.app.shoulderRightEnd)
-		while (abs(self.app.shoulderMotor.get_pos() - self.app.shoulderRightEnd) > self.app.motorAccuracy):
-			yield self.forDuration(0.05)
-		while (abs(self.app.hipMotor.get_pos() - self.app.hipRight) > self.app.motorAccuracy):
-			yield self.forDuration(0.05)
+		self.moveMotors(self.app.hipRight, self.app.shoulderRightEnd)
 
-class LeftStrokePlan(Plan):
+		# while (abs(self.app.shoulderMotor.get_pos() - self.app.shoulderRightEnd) > self.app.motorAccuracy):
+		# 	yield self.forDuration(0.05)
+		# while (abs(self.app.hipMotor.get_pos() - self.app.hipRight) > self.app.motorAccuracy):
+		# 	yield self.forDuration(0.05)
+
+
+class LeftStrokePlan(BasePlan):
 	def __init__(self, app, *arg, **kw):
-		Plan.__init__(self, app, *arg, **kw)
+		BasePlan.__init__(self, app, *arg, **kw)
 
 	def behavior(self):
 		self.app.setSpeed(20)
-		self.app.moveMotors(self.app.hipLeft, self.app.shoulderLeftEnd)
+		self.moveMotors(self.app.hipLeft, self.app.shoulderLeftEnd)
 
-		while (abs(self.app.shoulderMotor.get_pos() - self.app.shoulderLeftEnd) > self.app.motorAccuracy):
-			yield self.forDuration(0.05)
-		while (abs(self.app.hipMotor.get_pos() - self.app.hipLeft) > self.app.motorAccuracy):
-			yield self.forDuration(0.05)
+		# while (abs(self.app.shoulderMotor.get_pos() - self.app.shoulderLeftEnd) > self.app.motorAccuracy):
+		# 	yield self.forDuration(0.05)
+		# while (abs(self.app.hipMotor.get_pos() - self.app.hipLeft) > self.app.motorAccuracy):
+		# 	yield self.forDuration(0.05)
 
 class RightToLeftTransitionPlan(Plan):
 	def __init__(self, app, *arg, **kw):
@@ -54,32 +75,62 @@ class RightToLeftTransitionPlan(Plan):
 	def behavior(self):
 		self.app.setSpeed(101)
 
-		self.app.moveMotors(self.app.hipLeft, self.app.shoulderLeftBegin)
-		while (abs(self.app.shoulderMotor.get_pos() - self.app.shoulderLeftBegin) > self.app.motorAccuracy):
-			yield self.forDuration(0.05)
-		while (abs(self.app.hipMotor.get_pos() - self.app.hipLeft) > self.app.motorAccuracy):
-			yield self.forDuration(0.05)
+		self.moveMotors(self.app.hipLeft, self.app.shoulderLeftBegin)
+		# while (abs(self.app.shoulderMotor.get_pos() - self.app.shoulderLeftBegin) > self.app.motorAccuracy):
+		# 	yield self.forDuration(0.05)
+		# while (abs(self.app.hipMotor.get_pos() - self.app.hipLeft) > self.app.motorAccuracy):
+		# 	yield self.forDuration(0.05)
 
 class LeftToRightTransitionPlan(Plan):
 	def __init__(self, app, *arg, **kw):
 		Plan.__init__(self, app, *arg, **kw)
 
 	def behavior(self):
-		pass
+		self.app.setSpeed(101)
+
+		self.app.moveMotors(self.app.hipRight, self.app.shoulderRightBegin)
+
+		self.waitForMotorPos(self.app.hipRight, self.app.shoulderRightBegin)
+		# while (abs(self.app.shoulderMotor.get_pos() - self.app.shoulderRightBegin) > self.app.motorAccuracy):
+		# 	yield self.forDuration(0.05)
+		# while (abs(self.app.hipMotor.get_pos() - self.app.hipRight) > self.app.motorAccuracy):
+		# 	yield self.forDuration(0.05)
 
 class RightResetPlan(Plan):
 	def __init__(self, app, *arg, **kw):
 		Plan.__init__(self, app, *arg, **kw)
 
 	def behavior(self):
-		pass
+		self.app.setSpeed(101)
+		currShoulder = self.app.shoulderMotor.get_pos()
+
+		hipUp = self.app.hipRight * 0.9
+
+		# lift up slightly without moving shoulder
+		self.moveMotors(hipUp, currShoulder)
+		# self.waitForMotorPos(hipUp, currShoulder)
+
+		self.moveMotors(hipUp, self.app.shoulderRightBegin)
+		# self.waitForMotorPos(hipUp, self.app, shoulderRightBegin)
+
+		self.moveMotors(self.app.hipRight, self.app.shoulderRightBegin)
+		# self.waitForMotorPos(self.app.hipRight, self.app.shoudlerRightBegin)
 
 class LeftResetPlan(Plan):
 	def __init__(self, app, *arg, **kw):
 		Plan.__init__(self, app, *arg, **kw)
 
 	def behavior(self):
-		pass
+		self.app.setSpeed(101)
+		
+		currShoulder = self.app.shoulderMotor.get_pos()
+		hipUp = self.app.hipLeft * 0.9
+
+		self.moveMotors(hipUp, currShoulder)
+
+		self.moveMotors(hipUp, self.app.shoulderLeftBegin)
+
+		self.moveMotors(self.app.hipRight, self.app.shoulderLeftBegin)
 
 class KayakApp(JoyApp):
 	def __init__(self, hipMotor, shoulderMotor, *arg, **kw):
@@ -98,13 +149,19 @@ class KayakApp(JoyApp):
 		exec("self.hipMotor = self.robot.at." + hipMotorString)
 		exec("self.shoulderMotor = self.robot.at." + shoulderMotorString)
 
-	def moveMotors(self, hipMotorPos, shoulderMotorPos):
-		self.hipMotor.set_pos(hipMotorPos)
-		self.shoulderMotor.set_pos(shoulderMotorPos)
+	# def moveMotors(self, hipMotorPos, shoulderMotorPos):
+	# 	self.hipMotor.set_pos(hipMotorPos)
+	# 	self.shoulderMotor.set_pos(shoulderMotorPos)
 
 	def setSpeed(self, speed):
 		self.hipMotor.set_speed(speed)
 		self.shoulderMotor.set_speed(speed)
+
+		# make sure the speed was actually set
+		while (hipMotor.get_speed() != speed):
+			self.hipMotor.set_speed(speed)
+		while (shoulderMotor.get_speed() != speed):
+			self.shoulderMotor.set_speed(speed)
 
 	def onStart(self):
 		self.rightStrokePlan = RightStrokePlan(self)
