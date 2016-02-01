@@ -15,12 +15,14 @@ class KayakApp(JoyApp):
 		self.shoulderMotorString = shoulderMotorString
 
 		self.motorAccuracy = 200
-		self.hipRight = 4600
-		self.hipLeft = -4600
-		self.shoulderLeftBegin = -205
-		self.shoulderLeftEnd = -2700
-		self.shoulderRightBegin = 205
-		self.shoulderRightEnd = 2700
+		self.hipRight = 1300
+		self.hipLeft = -1300
+		self.shoulderLeftBegin = 3000
+		self.shoulderLeftEnd = -3000
+		self.shoulderRightBegin = -3000
+		self.shoulderRightEnd = 3000
+
+		self.strokeLength = 1.0
 
 		self.motorSpeedFast = 113
 		self.motorSpeedSlow = 60
@@ -109,6 +111,17 @@ class KayakApp(JoyApp):
 			print "hip: " + str(self.hipMotor.get_pos())
 			print "shoulder: " + str(self.shoulderMotor.get_pos())
 			print "state: " + str(self.currState())
+		elif evt.key == K_y:
+			self.strokeLength = 0.2
+		elif evt.key == K_u:
+			self.strokeLength = 0.4
+		elif evt.key == K_i:
+			self.strokeLength = 0.6
+		elif evt.key == K_o:
+			self.strokeLength = 0.8
+		elif evt.key == K_p:
+			self.strokeLength = 1.0
+
 
 robot = {"count": 2}
 scr = {}
