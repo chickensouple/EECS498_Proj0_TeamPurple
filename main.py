@@ -10,7 +10,12 @@ shoulderMotorString = "Nx0B"
 
 class KayakApp(JoyApp):
 	def __init__(self, hipMotor, shoulderMotor, *arg, **kw):
-		JoyApp.__init__(self, *arg, **kw)
+		cfg = dict(
+			nodeNames = { 
+				0x0c : 'hip',
+				0x0b : 'shoulder'
+		})
+		JoyApp.__init__(self, cfg=cfg, *arg, **kw)
 		self.hipMotorString = hipMotorString
 		self.shoulderMotorString = shoulderMotorString
 
@@ -26,9 +31,10 @@ class KayakApp(JoyApp):
 
 		self.motorSpeedFast = 113
 		self.motorSpeedSlow = 60
-
-		exec("self.hipMotor = self.robot.at." + hipMotorString)
-		exec("self.shoulderMotor = self.robot.at." + shoulderMotorString)
+		self.hipMotor = self.robot.at.hip
+		self.shoulderMotor = self.robot.at.shoulder
+		#exec("self.hipMotor = self.robot.at." + hipMotorString)
+		#exec("self.shoulderMotor = self.robot.at." + shoulderMotorString)
 
 	## GENERAL FUNCTIONS
 	def moveMotors(self, hipMotorPos, shoulderMotorPos):
@@ -73,6 +79,7 @@ class KayakApp(JoyApp):
 				return State.RIGHT_END
 
 	def onStart(self):
+		self.waitForPos = WaitForPos(self,motors=[self.robot.at.hip, self.motor.at.shoulder])
 		self.rightStrokeAction = RightStrokeAction(self)
 		self.leftStrokeAction = LeftStrokeAction(self)
 		self.rightToLeftTransitionAction = RightToLeftTransitionAction(self)
