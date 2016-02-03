@@ -1,26 +1,5 @@
 from joy import *
 
-class WaitForPos(Plan):
-	def __init__(self,app,motors,*arg,**kw):
-		Plan.__init__(self,app,*arg,**kw)
-		self.m = motors
-		self.goal = []
-
-	def withGoals( self, *goals ):
-		assert len(self.m) == len(goals)
-		self.goal = goals
-		return self
-
-	def behavior(self):
-		assert len(self.m) == len(self.goal)
-		bad = -1
-		while bad:
-			bad = 0
-			for m,g in zip(self.m, self.goal):
-				if (m.get_pos() -g)>self.app.motorAccuracy:
-					bad += 1
-			yield self.forDuration(0.05)
-
 class RightStrokeAction(Plan):
 	def __init__(self, app, *arg, **kw):
 		Plan.__init__(self, app, *arg, **kw)
@@ -30,8 +9,11 @@ class RightStrokeAction(Plan):
 
 		shoulderRightEnd = self.app.shoulderRightEnd * self.app.strokeLength
 		self.app.moveMotors(self.app.hipRight, shoulderRightEnd)
-		
-		yield self.app.waitForPos.withGoals(shoulderRightEnd, self.app.hipRight)
+
+		while (abs(self.app.shoulderMotor.get_pos() - shoulderRightEnd) > self.app.motorAccuracy):
+			yield self.forDuration(0.01)
+		while (abs(self.app.hipMotor.get_pos() - self.app.hipRight) > self.app.motorAccuracy):
+			yield self.forDuration(0.01)
 
 class LeftStrokeAction(Plan):
 	def __init__(self, app, *arg, **kw):
@@ -74,7 +56,6 @@ class LeftToRightTransitionAction(Plan):
 
 		self.app.moveMotors(self.app.hipRight, shoulderRightBegin)
 		while (abs(self.app.shoulderMotor.get_pos() - shoulderRightBegin) > self.app.motorAccuracy):
-			progress("Shoulder %s" % self.app.shoulderMotor.get_pos())
 			yield self.forDuration(0.01)
 		while (abs(self.app.hipMotor.get_pos() - self.app.hipRight) > self.app.motorAccuracy):
 			yield self.forDuration(0.01)
