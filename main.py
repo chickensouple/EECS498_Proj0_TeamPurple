@@ -5,18 +5,22 @@ from state import *
 import time
 
 # parameters
-hipMotorString = "Nx0C"
-shoulderMotorString = "Nx0B"
+hipMotorNum = 0x0c
+shoulderMotorNum = 0x0b
 
 class KayakApp(JoyApp):
-	def __init__(self, hipMotor, shoulderMotor, *arg, **kw):
-		JoyApp.__init__(self, *arg, **kw)
-		self.hipMotorString = hipMotorString
-		self.shoulderMotorString = shoulderMotorString
+	""" Main app to run the program that controls our robot """
+	def __init__(self, *arg, **kw):
+		cfg = dict(
+			nodeNames = { 
+				hipMotorNum : 'hip',
+				shoulderMotorNum : 'shoulder'
+		})
+		JoyApp.__init__(self, cfg=cfg, *arg, **kw)
 
-		self.motorAccuracy = 200
+		self.motorAccuracy = 300
 		self.hipRight = 1300
-		self.hipLeft = -1300
+		self.hipLeft = -1600
 		self.shoulderLeftBegin = 3000
 		self.shoulderLeftEnd = -3000
 		self.shoulderRightBegin = -3000
@@ -25,17 +29,19 @@ class KayakApp(JoyApp):
 		self.strokeLength = 1.0
 
 		self.motorSpeedFast = 113
-		self.motorSpeedSlow = 60
+		self.motorSpeedSlow = 90
 
-		exec("self.hipMotor = self.robot.at." + hipMotorString)
-		exec("self.shoulderMotor = self.robot.at." + shoulderMotorString)
+		self.hipMotor = self.robot.at.hip
+ 		self.shoulderMotor = self.robot.at.shoulder
 
 	## GENERAL FUNCTIONS
 	def moveMotors(self, hipMotorPos, shoulderMotorPos):
+		""" Sends a command to the hip and shoulder motor in centidegrees """
 		self.hipMotor.set_pos(hipMotorPos)
 		self.shoulderMotor.set_pos(shoulderMotorPos)
 
 	def setSpeed(self, speed):
+		""" Sets the speed of the servo motors on a range of [0, 113] """
 		self.hipMotor.set_speed(speed)
 		self.shoulderMotor.set_speed(speed)
 
@@ -46,6 +52,10 @@ class KayakApp(JoyApp):
 			self.shoulderMotor.set_speed(speed)
 
 	def currState(self):
+		""" 
+			This looks at the current angles the robot's motors are at and returns
+			what the closest state to it is as defined by the state transition diagram
+		"""
 		hipMotorAngle = self.hipMotor.get_pos()
 		hipDifferences = dict()
 		hipDifferences[abs(hipMotorAngle - self.hipLeft)] = 0
@@ -126,5 +136,5 @@ class KayakApp(JoyApp):
 robot = {"count": 2}
 scr = {}
 
-app = KayakApp(hipMotorString, shoulderMotorString, robot=robot, scr=scr)
+app = KayakApp(robot=robot, scr=scr)
 app.run()

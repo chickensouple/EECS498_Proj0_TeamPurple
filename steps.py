@@ -2,7 +2,12 @@ from joy import *
 from state import *
 import timeit
 
+# This functions in this file build off the lower level motions defined in actions.py
+# It will chain together appropriate state transitions to form a higher level motion such as "Do an entire right stroke"
+# See the "High Level Motions" section in the Code Documentation for more details
+
 class RightStrokeStep(Plan):
+	""" Does the RightStrokeStep as described in the Code Documentation """
 	def __init__(self, app, *arg, **kw):
 		Plan.__init__(self, app, *arg, **kw)
 
@@ -22,6 +27,7 @@ class RightStrokeStep(Plan):
 			yield self.app.rightStrokeAction
 
 class LeftStrokeStep(Plan):
+	""" Does the LeftStrokeStep as described in the Code Documentation """
 	def __init__(self, app, *arg, **kw):
 		Plan.__init__(self, app, *arg, **kw)
 
@@ -41,6 +47,7 @@ class LeftStrokeStep(Plan):
 			yield self.app.leftStrokeAction
 
 class ForwardStep(Plan):
+	""" Does the ForwardStrokeStep as described in the Code Documentation """
 	def __init__(self, app, *arg, **kw):
 		Plan.__init__(self, app, *arg, **kw)
 
